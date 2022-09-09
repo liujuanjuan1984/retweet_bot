@@ -3,7 +3,7 @@ import datetime
 import json
 import logging
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 from mininode import MiniNode
 from mininode.crypto import account
@@ -24,13 +24,13 @@ datadir = os.path.join(os.path.dirname(thisdir), "data")
 class RetweetBot:
     """retweet bot"""
 
-    def __init__(self, seedurl: str=None, xpaths: Dict[str, str]=None):
+    def __init__(self, seedurl: str = None, xpaths: Dict[str, str] = None):
         self.driver = WebDriver().driver
         self.rum = MiniNode(seedurl or SEED)
-        self.xpaths = xpaths or XPATHS 
+        self.xpaths = xpaths or XPATHS
         self.users_file = os.path.join(thisdir, "users_private.json")
 
-    def retweet_users(self, users=None):
+    def retweet_users(self, users: Optional[Dict] = None):
         """retweet users
         users = {
             "https://example.com/personal_homepage": {
@@ -132,20 +132,19 @@ class RetweetBot:
                 JsonFile(datafile).write(data)
                 logger.debug("retweet: %s", resp["trx_id"])
 
-    def get_user_pvtkey(self, name, url):
+    def get_user_pvtkey(self, name: str, url: str) -> str:
         users = JsonFile(self.users_file).read({})
         user_info = users.get(url, {})
-        if not user_info or "keystore" not in user_info:
+        if "keystore" not in user_info:
             user_info = self.new_user(name, url)
             users[url] = user_info
             JsonFile(self.users_file).write(users)
             logger.info("init new user %s", name)
-        else:
-            keystore = json.loads(user_info["keystore"])
+        keystore = json.loads(user_info["keystore"])
         pvtkey = account.keystore_to_private_key(keystore, USER_ACCOUNT_PASSWORD)
         return pvtkey
 
-    def new_user(self, name, url, pvtkey=None):
+    def new_user(self, name: str, url: str, pvtkey: str = None) -> Dict[str, str]:
         pvtkey = pvtkey or account.create_private_key()
         keystore = account.private_key_to_keystore(pvtkey, USER_ACCOUNT_PASSWORD)
         user_info = {

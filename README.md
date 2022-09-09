@@ -21,11 +21,13 @@ pip install -r requirements.txt
 
 3、修改配置
 
-参考 config_private_sample.py 更新相关字段
+参考 config_private_sample.py 创建 config_private.py 文件并更新相关字段
 
 4、retweet 转推
 
-首次执行或有新用户时，把转推的 users 作为参数传入 retweet_users 方法，会自动映射密钥，并生成（或更新）users_private.json ，之后重复执行时无需指定 users ，会自动读取本地配置。
+首次执行或有新用户时，把转推的 name, url 作为参数传入 retweet_user 方法，会自动映射密钥，并生成（或更新）users_private.json 。参考 do_newuser.py
+
+之后重复执行时无需指定 users ，会自动读取本地配置。参考 do_forever.py 
 
 ```py
 users = {
