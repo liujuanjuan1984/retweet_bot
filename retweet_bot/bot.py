@@ -64,7 +64,10 @@ class RetweetBot:
         users = users or JsonFile(self.users_file).read({})
         for url in users:
             name = users[url]["name"]
-            self.retweet_user(name, url)
+            try:
+                self.retweet_user(name, url)
+            except:
+                logger.warning("retweet user failed: %s", name + url)
 
     def retweet_user(self, name: str, url: str):
         """retweet one user"""
