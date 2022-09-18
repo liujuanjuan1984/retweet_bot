@@ -107,6 +107,8 @@ class RetweetBot:
 
             # retweet
             if text or img:
+                if ORIGIN_URL_TYPE == "MERGE":
+                    text += (f"\n{TIPS[LANG]['origin']}{_url}",)
                 resp = self.rum.api.send_content(
                     pvtkey, content=text, images=[img], timestamp=date_str
                 )
@@ -118,17 +120,19 @@ class RetweetBot:
                 data[_url]["updated_at"] = str(datetime.datetime.now())
                 data[_url]["trx_id"] = resp["trx_id"]
 
-                # reply with the origin url
-                resp_reply = self.rum.api.reply_trx(
-                    pvtkey,
-                    resp["trx_id"],
-                    content=f"{TIPS[LANG]['origin']}{_url}",
-                    timestamp=date_str,
-                )
-                if "trx_id" in resp_reply:
-                    data[_url]["reply_origin"] = resp_reply["trx_id"]
-                else:
-                    logger.warning("reply failed: %s", resp_reply)
+                if ORIGIN_URL_TYPE == "SPLIT":
+                    # reply with the origin url
+                    resp_reply = self.rum.api.reply_trx(
+                        pvtkey,
+                        resp["trx_id"],
+                        content=f"{TIPS[LANG]['origin']}{_url}",
+                        timestamp=date_str,
+                    )
+                    if "trx_id" in resp_reply:
+                        data[_url]["reply_origin"] = resp_reply["trx_id"]
+                    else:
+                        logger.warning("reply failed: %s", resp_reply)
+
                 JsonFile(datafile).write(data)
                 logger.debug("retweet: %s", resp["trx_id"])
 

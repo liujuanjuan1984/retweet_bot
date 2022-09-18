@@ -30,3 +30,8 @@ TIPS = {
         "origin": "init by retweet bot, origin url: ",
     },
 }
+
+# the type of the origin url
+# SPLIT: the origin url will be a new trx to reply to the content
+# MERGE: the origin url will be added to the content
+ORIGIN_URL_TYPE = "SPLIT"

@@ -17,7 +17,7 @@ cd retweet_bot
 pip install -r requirements.txt
 ```
 
-安装与 chrome 版本一致的 chromedriver 并把可执行文件放在系统的 PATH 目录下
+安装与 chrome 版本一致的 [chromedriver](https://chromedriver.chromium.org/downloads) 并把可执行文件放在系统的 PATH 目录下
 
 3、修改配置
 
