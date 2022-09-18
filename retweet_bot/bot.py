@@ -30,6 +30,27 @@ class RetweetBot:
         self.xpaths = xpaths or XPATHS
         self.users_file = os.path.join(thisdir, "users_private.json")
 
+    def check_profiles(self, users: Optional[Dict] = None):
+        """check users profile and updated if needed"""
+        users = users or JsonFile(self.users_file).read({})
+        for url in users:
+            name = users[url]["name"]
+            self.check_profile(name, url)
+
+    def check_profile(self, name, url):
+        """check user profile and updated if needed"""
+        pvtkey = self.get_user_pvtkey(name, url)
+        pubkey = account.private_key_to_pubkey(pvtkey)
+        user = self.rum.api.get_profiles(types=("name",), senders=[pubkey])
+        if pubkey not in user:  # name not in chain_name :
+            resp = self.rum.api.update_profile(
+                pvtkey, name=f"{name}@{TIPS[LANG]['name']}"
+            )
+            if "trx_id" in resp:
+                logger.info("update profile: %s", name + url)
+        else:
+            logger.info("profile is ok: %s", user)
+
     def retweet_users(self, users: Optional[Dict] = None):
         """retweet users
         users = {
