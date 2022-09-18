@@ -129,7 +129,7 @@ class RetweetBot:
             # retweet
             if text or img:
                 if ORIGIN_URL_TYPE == "MERGE":
-                    text += (f"\n{TIPS[LANG]['origin']}{_url}",)
+                    text += f"\n{TIPS[LANG]['origin']}{_url}"
                 resp = self.rum.api.send_content(
                     pvtkey, content=text, images=[img], timestamp=date_str
                 )
