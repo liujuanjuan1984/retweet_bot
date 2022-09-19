@@ -24,32 +24,46 @@ datadir = os.path.join(os.path.dirname(thisdir), "data")
 class RetweetBot:
     """retweet bot"""
 
-    def __init__(self, seedurl: str = None, xpaths: Dict[str, str] = None):
-        self.driver = WebDriver().driver
+    def __init__(self, seedurl: str = None, xpaths: Dict[str, str] = None, mode="dark"):
+        self.driver = WebDriver(mode).driver
         self.rum = MiniNode(seedurl or SEED)
         self.xpaths = xpaths or XPATHS
         self.users_file = os.path.join(thisdir, "users_private.json")
+
+    def update_user_profile(self, name, url):
+        """update user profile in rum group with the avatar in user homepage url"""
+        # get avatar
+        self.driver.get(url)
+        try:
+            wait = WebDriverWait(self.driver, 10)
+            _element = wait.until(
+                EC.presence_of_element_located((By.XPATH, self.xpaths["avatar"]))
+            )
+        except Exception as err:
+            logger.warning("get avatar failed: %s", url)
+            return
+        avatar = base64.b64decode(_element.screenshot_as_base64)
+        name = f"{name}@{TIPS[LANG]['name']}"
+        # post to rum group
+        pvtkey = self.get_user_pvtkey(name, url)
+        resp = self.rum.api.update_profile(pvtkey, name=name, image=avatar)
+        if "trx_id" in resp:
+            logger.info("update profile: %s", url)
+        else:
+            logger.warning("update profile failed: %s", url)
 
     def check_profiles(self, users: Optional[Dict] = None):
         """check users profile and updated if needed"""
         users = users or JsonFile(self.users_file).read({})
         for url in users:
             name = users[url]["name"]
-            self.check_profile(name, url)
-
-    def check_profile(self, name, url):
-        """check user profile and updated if needed"""
-        pvtkey = self.get_user_pvtkey(name, url)
-        pubkey = account.private_key_to_pubkey(pvtkey)
-        user = self.rum.api.get_profiles(types=("name",), senders=[pubkey])
-        if pubkey not in user:  # name not in chain_name :
-            resp = self.rum.api.update_profile(
-                pvtkey, name=f"{name}@{TIPS[LANG]['name']}"
-            )
-            if "trx_id" in resp:
-                logger.info("update profile: %s", name + url)
-        else:
-            logger.info("profile is ok: %s", user)
+            pvtkey = self.get_user_pvtkey(name, url)
+            pubkey = account.private_key_to_pubkey(pvtkey)
+            user = self.rum.api.get_profiles(types=("name", "image"), senders=[pubkey])
+            # check the profile and update if needed
+            existed = user.get(pubkey, {}).get("image")
+            if not existed:
+                self.update_user_profile(name, url)
 
     def retweet_users(self, users: Optional[Dict] = None):
         """retweet users

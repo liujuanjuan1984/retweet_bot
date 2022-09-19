@@ -8,6 +8,7 @@ XPATHS = {
     "text": r'//*[@id="app"]/div[1]/article/div[2]/div[1]/div[1]/div',
     "screenshot": r'//*[@id="app"]/div[1]/article/div[2]',
     "posts": r'//a[starts-with(@href,"https://example.com/")]',
+    "avatar": r'//*[@id="app"]/div[1]/main/div/div[2]/',
 }
 
 
