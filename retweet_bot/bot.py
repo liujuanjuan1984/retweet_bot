@@ -93,13 +93,8 @@ class RetweetBot:
         user_id = url.split("/")[-1]
         datafile = os.path.join(datadir, f"{user_id}_{name}.json")
         if not os.path.exists(datafile):
-            resp = self.rum.api.update_profile(
-                pvtkey, name=f"{name}@{TIPS[LANG]['name']}"
-            )
-            if "trx_id" in resp:
-                JsonFile(datafile).write({})
-                logger.debug("create user datafile: %s", datafile)
-                logger.debug("update profile: %s", resp["trx_id"])
+            self.update_user_profile(name, url)
+            JsonFile(datafile).write({})
         data = JsonFile(datafile).read({})
 
         # get new posts
@@ -146,7 +141,7 @@ class RetweetBot:
             # retweet
             if text or img:
                 if ORIGIN_URL_TYPE == "MERGE":
-                    text += f"\n{TIPS[LANG]['origin']}{_url}"
+                    text += f""" <a href="{_url}" class="text-blue-400">{TIPS[LANG]['origin']}</a>"""
                 resp = self.rum.api.send_content(
                     pvtkey, content=text, images=[img], timestamp=date_str
                 )

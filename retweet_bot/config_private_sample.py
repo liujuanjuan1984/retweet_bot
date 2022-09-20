@@ -24,15 +24,15 @@ LANG = "CN"
 TIPS = {
     "CN": {
         "name": "机器人",
-        "origin": "本条动态由 bot 自动生成，原链接：",
+        "origin": "查看全文",
     },
     "EN": {
         "name": "bot",
-        "origin": "init by retweet bot, origin url: ",
+        "origin": "origin url",
     },
 }
 
 # the type of the origin url
 # SPLIT: the origin url will be a new trx to reply to the content
 # MERGE: the origin url will be added to the content
-ORIGIN_URL_TYPE = "SPLIT"
+ORIGIN_URL_TYPE = "MERGE"

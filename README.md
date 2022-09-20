@@ -29,13 +29,3 @@ pip install -r requirements.txt
 
 之后重复执行时无需指定 users ，会自动读取本地配置。参考 do_forever.py 
 
-```py
-users = {
-    "https://example.com/personal_homepage": {
-    "name": "somebody",
-    "url": "https://example.com/personal_homepage",
-    },
-}
-```
-
-
