@@ -1,31 +1,29 @@
 # retweet_bot
 
-可用作个人微博内容转推到 rum 种子网络。请注意，核心的 xpaths 语法，本 repo 并未提供有效数值，仅作示例。
+Read the database of SpiderBot and retweet to Quorum Group.
 
-如何部署？
+### How to use?
 
-1、拷贝源码
+Get the source code:
 
 ```sh
 git clone https://github.com/liujuanjuan1984/retweet_bot.git
 cd retweet_bot 
 ```
 
-2、安装依赖
+Install:
 
 ```sh
 pip install -r requirements.txt
 ```
 
-安装与 chrome 版本一致的 [chromedriver](https://chromedriver.chromium.org/downloads) 并把可执行文件放在系统的 PATH 目录下
+TIPS: the SpiderBot need chrome browser and [chromedriver](https://chromedriver.chromium.org/downloads).
 
-3、修改配置
+Update the config_private.py file using config_private_sample.py as example.
 
-参考 config_private_sample.py 创建 config_private.py 文件并更新相关字段
+Do the main job:
 
-4、retweet 转推
-
-首次执行或有新用户时，把转推的 name, url 作为参数传入 retweet_user 方法，会自动映射密钥，并生成（或更新）users_private.json 。参考 do_newuser.py
-
-之后重复执行时无需指定 users ，会自动读取本地配置。参考 do_forever.py 
-
+```py
+do_spider.py # get content by spiderbot
+do_retweet.py # retweet bot to rum by using database of spiderbot as data source
+```

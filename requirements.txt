@@ -1,2 +1,3 @@
-mininode 
 selenium
+mininode
+spiderbot
