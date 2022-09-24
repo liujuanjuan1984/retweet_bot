@@ -132,3 +132,5 @@ data/*
 config_private.py
 *.json
 temp*.py
+temp*.md
+*.db
