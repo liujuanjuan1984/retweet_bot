@@ -8,12 +8,40 @@ from eth_account import Account
 from retweet_bot.config_private import COMMON_ACCOUNT_PWD
 from retweet_bot.models.base import BaseDB
 from retweet_bot.models.posturls import PostURL
+from retweet_bot.models.progress import Progress
 from retweet_bot.models.users import User
 
 logger = logging.getLogger(__name__)
 
 
 class DBAPI(BaseDB):
+    def add_progress(self, progress_type, progress_uid=1):
+        """add progress"""
+        self.add(
+            Progress({"progress_type": progress_type, "progress_uid": progress_uid})
+        )
+
+    def update_progress(self, progress_type, progress_uid=1):
+        """update progress"""
+        self.session.query(Progress).filter(
+            Progress.progress_type == progress_type
+        ).update({"progress_uid": progress_uid})
+        self.commit()
+
+    def get_progress(self, progress_type):
+        """get progress"""
+        progress = (
+            self.session.query(Progress.progress_uid)
+            .filter(Progress.progress_type == progress_type)
+            .first()
+        )
+        if progress:
+            progress_uid = progress[0]
+        else:
+            self.add_progress(progress_type, 1)
+            progress_uid = 1
+        return progress_uid
+
     def update_user(
         self,
         user_url,

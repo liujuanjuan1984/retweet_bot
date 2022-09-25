@@ -1,14 +1,10 @@
+"""持续运行，通过任务计划程序来触发"""
 import datetime
-import time
 
 from retweet_bot import RetweetBot
 
-bot = RetweetBot(init=True)
+bot = RetweetBot(init=True, skip_driver=True)
 
-
-uid = 1
-while True:
-    bot.update_user_from_datadb(profile_status=None)
-    uid = bot.update_posturl_from_datadb(uid)
-    print(datetime.datetime.now(), uid)
-    time.sleep(5)
+bot.update_user_from_datadb(profile_status=None)
+uid = bot.update_posturl_from_datadb()
+print(datetime.datetime.now(), uid)

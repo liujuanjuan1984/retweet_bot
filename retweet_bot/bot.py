@@ -19,23 +19,31 @@ class RetweetBot:
         seedurl: str = None,
         data_db_name=None,
         db_name=None,
+        skip_driver=False,
+        xpaths=None,
         **kwargs,
     ):
         """data_db_name:the db_name of spiderbot"""
         self.rum = MiniNode(seedurl or SEED)
         self.db = RetweetAPI(db_name or DB_NAME, **kwargs)
-        self.spider = SpiderBot(data_db_name or DATA_DB_NAME, **kwargs)
+        self.spider = SpiderBot(
+            data_db_name or DATA_DB_NAME,
+            skip_driver=skip_driver,
+            xpaths=xpaths or XPATHS,
+        )
         self.keys = self.db.get_pvtkeys()
 
     def update_user_from_datadb(
         self, retweet_status=True, profile_status=None, keystore=None
     ):
         """add or update user from data database to retweet database"""
-        for user_url in self.spider.db.get_users_todo(working_status=True):
+        for user in self.spider.db.get_users_todo(working_status=True):
+            user_url = user[0]
             self.db.update_user(user_url, retweet_status, profile_status, keystore)
 
-    def update_posturl_from_datadb(self, uid=1):
+    def update_posturl_from_datadb(self, uid=None):
         """add or update posturl from data database to retweet database"""
+        uid = uid or self.db.get_progress("update_posturl_from_datadb")
         posts = self.spider.db.get_posts(uid=uid)
         for post in posts:
             uid = post.uid
@@ -45,6 +53,9 @@ class RetweetBot:
             retweet_status = None
             need_retweet = self.db.check_posturl_to_retweet(post_url)
             pvtkey = self.keys.get(user_url)
+            if not pvtkey:
+                logger.warning("no pvtkey: %s", user_url)
+                continue
             trx_id = None
             if need_retweet:
                 resp = self.send_post_to_rum(pvtkey, post)
@@ -58,7 +69,7 @@ class RetweetBot:
             self.db.update_post_url(
                 user_url, post_url, content_status, retweet_status, trx_id
             )
-
+            self.db.update_progress("update_posturl_from_datadb", uid)
         return uid
 
     def send_post_to_rum(self, pvtkey, post):
@@ -66,7 +77,7 @@ class RetweetBot:
         text = post.text
         img = post.screenshot
         if text or img:
-            text = text + f"""\n{TIPS[LANG]['origin']}: {post.post_url}"""
+            text = (text or "") + f"""\n{TIPS[LANG]['origin']}: {post.post_url}"""
             resp = self.rum.api.send_content(
                 pvtkey, content=text, images=[img], timestamp=post.post_time
             )

@@ -11,7 +11,7 @@ from retweet_bot import RetweetBot
 
 this_repo = os.path.dirname(__file__)
 print(this_repo)
-bot = RetweetBot(init=True)
+bot = RetweetBot(init=True, skip_driver=True)
 
 
 def history_user():
