@@ -40,6 +40,7 @@ class DBAPI(BaseDB):
         else:
             self.add_progress(progress_type, 1)
             progress_uid = 1
+        logger.info("get_progress %s %s", progress_type, progress_uid)
         return progress_uid
 
     def update_user(

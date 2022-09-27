@@ -1,4 +1,4 @@
-"""add new users to the spiderbot"""
+"""add new users to the spiderbot db"""
 
 import datetime
 import time

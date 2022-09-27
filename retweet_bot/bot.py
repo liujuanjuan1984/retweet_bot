@@ -21,15 +21,17 @@ class RetweetBot:
         db_name=None,
         skip_driver=False,
         xpaths=None,
+        init=None,
         **kwargs,
     ):
         """data_db_name:the db_name of spiderbot"""
         self.rum = MiniNode(seedurl or SEED)
-        self.db = RetweetAPI(db_name or DB_NAME, **kwargs)
+        self.db = RetweetAPI(db_name or DB_NAME, init=init, **kwargs)
         self.spider = SpiderBot(
             data_db_name or DATA_DB_NAME,
             skip_driver=skip_driver,
             xpaths=xpaths or XPATHS,
+            init=init,
         )
         self.keys = self.db.get_pvtkeys()
 
@@ -44,6 +46,7 @@ class RetweetBot:
     def update_posturl_from_datadb(self, uid=None):
         """add or update posturl from data database to retweet database"""
         uid = uid or self.db.get_progress("update_posturl_from_datadb")
+        logger.info("update_posturl_from_datadb: %s", uid)
         posts = self.spider.db.get_posts(uid=uid)
         for post in posts:
             uid = post.uid
